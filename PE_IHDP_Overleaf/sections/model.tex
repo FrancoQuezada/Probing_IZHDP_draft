@@ -1,0 +1,502 @@
+\section{Introduction}
+\label{sec:introduction}
+
+The delineation of site-specific management zones enables agricultural inputs to
+be applied at rates that reflect spatial differences in soil properties. In the
+Intra-Zone Homogeneity Delineation Problem (IHDP), a field is partitioned into a
+minimum number of contiguous regions satisfying a prescribed homogeneity level,
+under the assumption that the relevant soil attribute is known
+\citep{VicencioMedinaIHDP}. In practice, however, nutrient availability is only
+partially observed, and collecting additional soil samples entails a cost.
+Furthermore, the delineation is operationally valuable because all spatial units
+within a management zone can receive a common nutrient application rate.
+
+We consider a \emph{probing-enhanced} extension of the IHDP in which soil
+information is acquired endogenously before constructing the zones. The crop and
+the number of management zones are specified in advance. First, the
+decision-maker selects soil-testing locations. After the corresponding test
+outcomes are observed, the field is partitioned into contiguous zones and a
+nutrient application rate is selected for each zone. The objective is to
+minimize the sum of testing costs and the expected cost of nutrient application,
+while controlling within-zone nutrient heterogeneity and ensuring a prescribed
+probability of meeting crop-nutrition requirements. This setting couples spatial
+partitioning, information acquisition, and resource-allocation decisions in a
+two-stage stochastic optimization problem.
+
+\section{Problem definition and assumptions}
+\label{sec:problem}
+
+Let $F$ be an agricultural field partitioned into $n$ nonoverlapping geographic
+units $\J=\{1,\ldots,n\}$. Each unit $j\in\J$ has area $a_j>0$; taking
+$a_j=1$ represents a one-hectare grid. Spatial adjacency is represented by an
+undirected graph $G=(\J,\Eset)$, where $\{j,k\}\in\Eset$ if and only if units
+$j$ and $k$ share a boundary segment. We define the directed adjacency set
+$\A=\{(j,k),(k,j):\{j,k\}\in\Eset\}$. The field must be partitioned into
+exactly $K$ nonempty management zones, indexed by
+$\I=\{1,\ldots,K\}$, with $1\leq K<n$. Each zone must induce a connected
+subgraph of $G$.
+
+A single nutrient (e.g., crop-available nitrogen) and a predetermined crop are
+considered. The initial nutrient availability in unit $j$ is an uncertain
+quantity $\xi_j$, expressed in nutrient-equivalent units per hectare. A known
+threshold $\tau_j$ specifies the nutrient availability required in unit $j$ to
+attain the target crop performance. When the crop and conditions are uniform,
+one may take $\tau_j=\tau$ for all $j$. This threshold-based representation
+abstracts from an explicit yield-response function: nutrient additions above
+$\tau_j$ are assumed not to provide further benefits relevant to the model.
+The same effective nutrient application rate is applied to all units of a
+management zone. Thus, the available nutrient in unit $j$ after treatment is
+$\xi_j+d_j$, where $d_j$ is the selected rate. An extension with
+location-specific uptake efficiencies would require modifying this balance.
+
+\subsection{Uncertainty, probing, and decision timing}
+\label{subsec:information}
+
+Let $\boldsymbol{\xi}=(\xi_j)_{j\in\J}$ be the vector of initial nutrient
+availabilities, and let $\boldsymbol{\eta}=(\eta_j)_{j\in\J}$ be a vector of
+\emph{potential} testing outcomes. The joint distribution
+$P_{\boldsymbol{\xi},\boldsymbol{\eta}}$ is assumed known, including spatial
+correlations between geographic units. A test may reveal nutrient availability
+exactly ($\eta_j=\xi_j$) or imperfectly (for instance,
+$\eta_j=\xi_j+\varepsilon_j^{\mathrm{meas}}$). The joint law is assumed to
+admit regular conditional distributions, and all conditional moments used below
+are finite.
+
+In the \emph{first stage}, binary decisions $z_j$ determine whether unit $j$
+is tested. The selected testing set is
+\begin{equation}
+  S(z)=\{j\in\J:z_j=1\}.
+  \label{eq:selected-set}
+\end{equation}
+After the tests, the decision-maker observes only
+$\boldsymbol{\eta}_{S(z)}$. In the \emph{second stage}, the realized
+observation $h$ is used to determine the zone partition and nutrient rates.
+The true vector $\boldsymbol{\xi}$ is not assumed to become fully observable
+before these decisions; therefore, the second-stage decisions must be
+measurable with respect to the acquired information
+$\sigma(\boldsymbol{\eta}_{S(z)})$. There is no further corrective decision
+after the actual nutrient status is realized.
+
+The model imposes two operational requirements. First, the expected spatial
+variation \emph{within each zone}, conditional on the testing information,
+must remain below a prescribed tolerance. Second, each geographic unit must
+meet its crop-nutrition threshold with a specified conditional probability.
+These requirements are distinct: uniform nutrient addition within a zone does
+not, by itself, reduce the pre-existing variation among the units of that zone.
+
+\section{Notation and conditional coefficients}
+\label{sec:notation}
+
+Table~\ref{tab:notation} summarizes the sets, parameters, and information
+variables. The second-stage optimization variables are introduced immediately
+before the formulation.
+
+\begin{table}[htbp]
+\centering
+\caption{Sets, parameters, and random quantities.}
+\label{tab:notation}
+\small
+\renewcommand{\arraystretch}{1.16}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Symbol & Definition \\
+\midrule
+$F$, $\J$, $n$ & Field, set of geographic units, and number of units. \\
+$G=(\J,\Eset)$ & Undirected geographic adjacency graph. \\
+$\A$ & Directed arcs induced by $\Eset$. \\
+$\I=\{1,\ldots,K\}$ & Set of management zones; $K$ is fixed. \\
+$a_j>0$ & Area of unit $j$ (ha). \\
+$c_j^P\geq 0$ & Cost of testing unit $j$. \\
+$c^N>0$ & Cost per unit of applied nutrient. \\
+$\tau_j$ & Crop-nutrition target in unit $j$ (nutrient/ha). \\
+$\delta\geq0$ & Maximum permitted conditional root-mean-square intra-zone dispersion (nutrient/ha). \\
+$\epsilon\in(0,1)$ & Maximum allowed conditional probability of a nutrition deficit in each unit. \\
+$\bar u>0$ & Upper bound on the nutrient rate (nutrient/ha). \\
+$\boldsymbol{\xi}$ & Random vector of actual initial nutrient availabilities. \\
+$\boldsymbol{\eta}$ & Random vector of potential testing outcomes. \\
+$z_j\in\{0,1\}$ & First-stage decision: whether unit $j$ is tested. \\
+$S(z)$ & Set of units selected for testing. \\
+$h$ & Realized outcome of the selected tests. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+All conditional coefficients below are understood to depend on a fixed
+first-stage selection $S\subseteq\J$ and a realized observation
+$h$ in the support of $\boldsymbol{\eta}_S$.
+
+\subsection{Conditional within-zone homogeneity}
+\label{subsec:homogeneity}
+
+Denote the conditional mean and covariance of the nutrient field by
+\begin{equation}
+\begin{split}
+  \mu_j(S,h) &= \EE[\xi_j\mid\boldsymbol{\eta}_S=h],\\
+  \Sigma_{jk}(S,h) &= \Cov(\xi_j,\xi_k\mid\boldsymbol{\eta}_S=h).
+\end{split}
+\label{eq:posterior-moments}
+\end{equation}
+For two geographic units, define the posterior expected squared difference
+\begin{equation}
+\begin{aligned}
+ D_{jk}(S,h)
+ &:=\EE\!\left[(\xi_j-\xi_k)^2\mid\boldsymbol{\eta}_S=h\right]\\
+ &=\bigl(\mu_j(S,h)-\mu_k(S,h)\bigr)^2
+   +\Sigma_{jj}(S,h)+\Sigma_{kk}(S,h)-2\Sigma_{jk}(S,h).
+\end{aligned}
+\label{eq:pairwise-difference}
+\end{equation}
+These coefficients account for both the estimated spatial pattern and the
+remaining uncertainty, including spatial dependence. In particular,
+$D_{jj}(S,h)=0$.
+
+For a nonempty zone $i$, let
+\begin{equation}
+  \rho_i(x)=\sum_{j\in\J}x_{ji},\qquad
+  \bar\xi_i(x,\boldsymbol{\xi})
+   =\frac{\sum_{j\in\J}x_{ji}\xi_j}{\rho_i(x)}.
+  \label{eq:zone-mean}
+\end{equation}
+We measure its realized intra-zone dispersion by the (population-normalized)
+within-zone variance. Geographic units are weighted equally in this statistic,
+as appropriate for the one-hectare grid; an area-weighted variant may be used
+for unequal spatial cells. The variance is
+\begin{equation}
+  V_i(x,\boldsymbol{\xi})
+  =\frac{1}{\rho_i(x)}\sum_{j\in\J}
+       x_{ji}\bigl(\xi_j-\bar\xi_i(x,\boldsymbol{\xi})\bigr)^2.
+  \label{eq:within-zone-var}
+\end{equation}
+The identity relating variance to pairwise squared differences yields
+\begin{equation}
+  \EE\!\left[V_i(x,\boldsymbol{\xi})
+       \mid\boldsymbol{\eta}_S=h\right]
+  =\frac{1}{2\rho_i(x)^2}
+       \sum_{j\in\J}\sum_{k\in\J}
+          D_{jk}(S,h)x_{ji}x_{ki}.
+  \label{eq:conditional-zone-var}
+\end{equation}
+We require this quantity to be at most $\delta^2$ for every zone. This
+zone-by-zone requirement deliberately differs from the \emph{global} relative
+variance (RV) measure used in the original IHDP. It is chosen because the
+same nutrient rate will be applied throughout each delineated zone.
+
+\subsection{Conditional nutrient sufficiency}
+\label{subsec:quantile}
+
+For each unit $j$, define the conditional lower-tail threshold
+\begin{equation}
+  q_{\epsilon,j}(S,h)
+  :=\sup\Bigl\{t\in\mathbb R:
+    \PP\bigl(\xi_j<t\mid\boldsymbol{\eta}_S=h\bigr)
+       \leq\epsilon\Bigr\}.
+  \label{eq:quantile-definition}
+\end{equation}
+We assume this threshold is finite. The strict inequality inside the
+probability makes the definition appropriate for both continuous and discrete
+posterior distributions. When the conditional distribution is continuous and
+strictly increasing at the relevant level, it is the usual lower
+$\epsilon$-quantile. For a fixed application rate $d_j$, the following
+conditions are equivalent:
+\begin{equation}
+\begin{aligned}
+ \PP\bigl(\xi_j+d_j\geq\tau_j
+      \mid\boldsymbol{\eta}_S=h\bigr)&\geq1-\epsilon
+ \\[-1pt]
+ &\Longleftrightarrow\quad
+ d_j\geq\tau_j-q_{\epsilon,j}(S,h).
+\end{aligned}
+\label{eq:chance-equivalence}
+\end{equation}
+Thus, conditional nutritional reliability can be enforced through a
+deterministic lower bound on $d_j$ once the posterior is known. These are
+\emph{individual} chance constraints: a probability $1-\epsilon$ is required
+for each unit separately, not jointly for the entire field.
+
+\section{Two-stage stochastic optimization formulation}
+\label{sec:formulation}
+
+\subsection{Decisions and objective}
+\label{subsec:decisions}
+
+For a given testing set $S$ and observation $h$, the second-stage variables
+are
+\begin{itemize}
+\item $x_{ji}\in\{0,1\}$: one if unit $j$ belongs to management zone $i$;
+\item $r_{ji}\in\{0,1\}$: one if unit $j$ is selected as the root of zone $i$;
+\item $u_i\in[0,\bar u]$: nutrient application rate shared by all units in zone $i$;
+\item $d_j\in[0,\bar u]$: nutrient application rate received by unit $j$;
+\item $g_{ij}\geq0$: artificial flow sent from a super-source to unit $j$ for zone $i$;
+\item $f_{ijk}\geq0$: artificial flow on directed arc $(j,k)\in\A$ for zone $i$.
+\end{itemize}
+The flow and root variables serve only to certify spatial connectivity;
+they do not represent physical movement of fertilizer.
+
+The first-stage objective is
+\begin{equation}
+\boxed{\displaystyle
+\min_{z\in\{0,1\}^{n}}
+ \left\{
+   \sum_{j\in\J} c_j^P z_j
+    +\EE_{\boldsymbol{\eta}_{S(z)}}\!\left[
+       Q\bigl(S(z),\boldsymbol{\eta}_{S(z)}\bigr)
+     \right]
+ \right\}.}
+\label{eq:first-stage}
+\end{equation}
+The first term is the cost of acquiring information. The recourse function
+$Q(S,h)$ is the minimum nutrient-application cost when the available
+information is $\boldsymbol{\eta}_{S}=h$. In particular,
+$S=\varnothing$ is permitted and corresponds to no additional soil testing.
+
+\subsection{Second-stage model}
+\label{subsec:recourse}
+
+For fixed $(S,h)$, the second-stage optimization problem is
+\allowdisplaybreaks
+\begin{align}
+Q(S,h)=\min_{x,r,g,f,u,d}\quad
+ &c^N\sum_{j\in\J}a_jd_j
+ &&\label{eq:recourse-objective}\\
+\text{s.t.}\quad
+ &\sum_{i\in\I}x_{ji}=1
+ &&\forall j\in\J,\label{eq:assign}\\
+ &\sum_{j\in\J}x_{ji}\geq1
+ &&\forall i\in\I,\label{eq:nonempty}\\
+ &\sum_{j\in\J}r_{ji}=1
+ &&\forall i\in\I,\label{eq:one-root}\\
+ &r_{ji}\leq x_{ji}
+ &&\forall i\in\I,\ j\in\J,\label{eq:root-located}\\
+ &\sum_{j\in\J}g_{ij}=\sum_{j\in\J}x_{ji}
+ &&\forall i\in\I,\label{eq:source-balance}\\
+ &0\leq g_{ij}\leq n\,r_{ji}
+ &&\forall i\in\I,\ j\in\J,\label{eq:source-capacity}\\
+ &\sum_{k:(k,j)\in\A}f_{ikj}+g_{ij}
+       -\sum_{k:(j,k)\in\A}f_{ijk}=x_{ji}
+ &&\forall i\in\I,\ j\in\J,\label{eq:flow-balance}\\
+ &0\leq f_{ijk}\leq (n-1)x_{ji}
+ &&\forall i\in\I,\ (j,k)\in\A,\label{eq:flow-tail}\\
+ &f_{ijk}\leq(n-1)x_{ki}
+ &&\forall i\in\I,\ (j,k)\in\A,\label{eq:flow-head}\\
+ &d_j-u_i\leq\bar u(1-x_{ji})
+ &&\forall i\in\I,\ j\in\J,\label{eq:dose-link-1}\\
+ &u_i-d_j\leq\bar u(1-x_{ji})
+ &&\forall i\in\I,\ j\in\J,\label{eq:dose-link-2}\\
+ &\sum_{j,k\in\J}D_{jk}(S,h)x_{ji}x_{ki}
+     \leq2\delta^2\!\left(\sum_{j\in\J}x_{ji}\right)^{\!2}
+ &&\forall i\in\I,\label{eq:homogeneity}\\
+ &d_j\geq\tau_j-q_{\epsilon,j}(S,h)
+ &&\forall j\in\J,\label{eq:nutrition}\\
+ &x_{ji},r_{ji}\in\{0,1\}
+ &&\forall i\in\I,\ j\in\J,\label{eq:binary-domain}\\
+ &f_{ijk}\geq0,\quad g_{ij}\geq0
+ &&\forall i\in\I,\ (j,k)\in\A,\ j\in\J,\label{eq:flow-domain}\\
+ &0\leq u_i\leq\bar u,\quad0\leq d_j\leq\bar u
+ &&\forall i\in\I,\ j\in\J.\label{eq:dose-domain}
+\end{align}
+We set $Q(S,h)=+\infty$ if no feasible second-stage decision exists.
+The main formulation therefore selects only testing designs that admit a
+feasible recourse decision for almost every observation. This is an explicit
+feasibility assumption of the base model: a fixed $K$ and a stringent
+homogeneity tolerance may otherwise prevent a feasible partition for some
+observations. In applications without relatively complete recourse, one can
+introduce explicitly penalized violations or revise the admissible testing
+designs. The bound $\bar u$ must also be chosen consistently with the
+nutritional targets and the support of the posterior distributions.
+
+\subsection{Interpretation of the constraints}
+\label{subsec:interpretation}
+
+The objective \eqref{eq:first-stage} minimizes the \emph{expected total cost}
+of probing and nutrient application. The recourse objective
+\eqref{eq:recourse-objective} charges for the amount applied to each geographic
+unit, taking its area into account. Hence, when all $a_j=1$, the cost is
+proportional to the sum of applied nutrient rates over all hectares.
+
+Constraint \eqref{eq:assign} assigns every unit to exactly one zone, while
+\eqref{eq:nonempty} enforces exactly $K$ nonempty zones, as their number is
+fixed in advance. Constraints \eqref{eq:one-root}--\eqref{eq:root-located}
+select one geographic root per zone. Constraints
+\eqref{eq:source-balance}--\eqref{eq:flow-head} enforce \emph{connectivity}:
+the artificial super-source supplies one unit of flow to every selected
+geographic unit, and positive flow may traverse an adjacency arc only when
+both endpoints belong to the same zone. Since only the root can receive flow
+from the super-source, every unit assigned to a zone must be connected to
+its root through units of that same zone. Consequently, each zone induces a
+connected subgraph of $G$.
+
+Constraints \eqref{eq:dose-link-1}--\eqref{eq:dose-link-2} impose the
+\emph{uniform nutrient rate} requirement. If $x_{ji}=1$, they force
+$d_j=u_i$. If $x_{ji}=0$, they are inactive because both rates belong to
+$[0,\bar u]$. Thus, $d_j$ is precisely the common rate of the zone to
+which unit $j$ is assigned; no bilinear product $x_{ji}u_i$ is needed in the
+objective.
+
+Constraint \eqref{eq:homogeneity} is the within-zone homogeneity
+requirement. Because each zone is nonempty, Equation
+\eqref{eq:conditional-zone-var} shows that this quadratic constraint is
+exactly equivalent to
+$\EE[V_i(x,\boldsymbol{\xi})\mid\boldsymbol{\eta}_S=h]\leq\delta^2$.
+The tolerance $\delta$ is specified by the decision-maker and applies to
+each zone separately. Constraint \eqref{eq:nutrition} enforces the
+conditional chance constraint
+$\PP(\xi_j+d_j\geq\tau_j\mid\boldsymbol{\eta}_S=h)\geq1-\epsilon$
+for each geographic unit. Finally,
+\eqref{eq:binary-domain}--\eqref{eq:dose-domain} define the variable
+domains. The homogeneity restrictions are generally nonconvex in the binary
+assignment decisions, so the proposed recourse problem is not claimed to be
+a mixed-integer linear program.
+
+\Needspace{16\baselineskip}
+\subsection{Optimal nutrient rate for a fixed partition}
+\label{subsec:optimal-dose}
+
+The model has an elementary but useful structure: once the partition has
+been fixed, the optimal nutrient rates can be obtained analytically.
+
+\begin{proposition}\label{prop:optimal-dose}
+Fix $S$, $h$, and a partition $\Z=\{Z_1,\ldots,Z_K\}$ satisfying the
+assignment, nonemptiness, connectivity, and conditional homogeneity
+requirements. Suppose the nutrient cost $c^N$ and all areas $a_j$ are
+positive, and the resulting nutrient rates do not exceed $\bar u$. Then
+the optimal rate for zone $i$ is
+\begin{equation}
+  u_i^*(S,h,\Z)
+  =\max\left\{0,\,\max_{j\in Z_i}
+       \bigl(\tau_j-q_{\epsilon,j}(S,h)\bigr)\right\}.
+  \label{eq:closed-form-dose}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+For $j\in Z_i$, constraints
+\eqref{eq:dose-link-1}--\eqref{eq:dose-link-2} imply $d_j=u_i$.
+Constraint \eqref{eq:nutrition} consequently requires
+$u_i\geq\tau_j-q_{\epsilon,j}(S,h)$ for every $j\in Z_i$, as well as
+$u_i\geq0$. The nutrient cost of zone $i$ equals
+$c^N u_i\sum_{j\in Z_i}a_j$, which is strictly increasing in $u_i$.
+The smallest feasible rate is therefore optimal.
+\end{proof}
+
+Accordingly, the operational cost of a fixed partition is
+\begin{equation}
+  C^N(\Z\mid S,h)
+  =c^N\sum_{i=1}^{K}\left(\sum_{j\in Z_i}a_j\right)
+       \max\left\{0,\max_{j\in Z_i}
+           \bigl(\tau_j-q_{\epsilon,j}(S,h)\bigr)\right\}.
+  \label{eq:partition-cost}
+\end{equation}
+This expression makes the economic role of delineation explicit: a single
+low-nutrient unit can determine the rate applied to an entire management
+zone. Grouping units with similar nutrient needs can therefore reduce
+fertilizer expenditures even when the number of zones is fixed.
+
+\section{Finite-scenario representation and endogenous nonanticipativity}
+\label{sec:scenario}
+
+For computation, suppose the joint distribution is represented by a finite
+scenario set $\Om$. Each scenario $\omega\in\Om$ has probability
+$\pi_\omega>0$ with $\sum_{\omega\in\Om}\pi_\omega=1$, and specifies
+$(\boldsymbol{\xi}^{\omega},\boldsymbol{\eta}^{\omega})$. Scenario-dependent
+second-stage variables are denoted by
+$(x^{\omega},r^{\omega},g^{\omega},f^{\omega},u^{\omega},d^{\omega})$.
+The first-stage testing decisions $z$ are common to all scenarios.
+
+For any two scenarios, let
+\begin{equation}
+  \Delta_{\omega\nu}
+   =\{j\in\J:\eta_j^{\omega}\neq\eta_j^{\nu}\},\qquad
+  m_{\omega\nu}(z)=\sum_{j\in\Delta_{\omega\nu}}z_j.
+  \label{eq:distinguishability}
+\end{equation}
+Thus, $m_{\omega\nu}(z)=0$ if and only if the selected tests cannot
+distinguish scenarios $\omega$ and $\nu$. The corresponding information
+class and its probability are
+\begin{equation}
+\begin{aligned}
+ \mathcal C_\omega(z)
+   &=\{\nu\in\Om:m_{\omega\nu}(z)=0\},\\
+ P_\omega(z)&=\sum_{\nu\in\mathcal C_\omega(z)}\pi_\nu.
+\end{aligned}
+\label{eq:information-class}
+\end{equation}
+For scenario $\omega$, conditional coefficients are computed from
+this information class. In particular,
+\begin{equation}
+  D_{jk}^{\omega}(z)
+   =\frac{1}{P_\omega(z)}
+       \sum_{\nu\in\mathcal C_\omega(z)}
+          \pi_\nu(\xi_j^{\nu}-\xi_k^{\nu})^2,
+  \label{eq:scenario-dispersion}
+\end{equation}
+while $q_{\epsilon,j}^{\omega}(z)$ is the lower-tail threshold
+\eqref{eq:quantile-definition} of the discrete distribution placing mass
+$\pi_\nu/P_\omega(z)$ on $\xi_j^{\nu}$ for
+$\nu\in\mathcal C_\omega(z)$.
+
+The finite-scenario counterpart minimizes
+\begin{equation}
+ \min\quad
+   \sum_{j\in\J}c_j^Pz_j
+   +c^N\sum_{\omega\in\Om}\pi_\omega
+      \sum_{j\in\J}a_jd_j^{\omega},
+ \label{eq:scenario-objective}
+\end{equation}
+subject to a copy of the second-stage constraints
+\eqref{eq:assign}--\eqref{eq:dose-domain} for each $\omega\in\Om$,
+using $D_{jk}^{\omega}(z)$ and $q_{\epsilon,j}^{\omega}(z)$ in
+\eqref{eq:homogeneity} and \eqref{eq:nutrition}, together with the
+following \emph{probing-dependent nonanticipativity} conditions:
+\begin{equation}
+\begin{aligned}
+ \bigl|x_{ji}^{\omega}-x_{ji}^{\nu}\bigr|
+   &\leq m_{\omega\nu}(z)
+   &&\forall \omega,\nu\in\Om,\ j\in\J,\ i\in\I,\\
+ \bigl|u_i^{\omega}-u_i^{\nu}\bigr|
+   &\leq \bar u\,m_{\omega\nu}(z)
+   &&\forall \omega,\nu\in\Om,\ i\in\I.
+\end{aligned}
+\label{eq:NA}
+\end{equation}
+
+When $m_{\omega\nu}(z)=0$, the scenarios yield identical observations,
+and \eqref{eq:NA} requires identical partitions and zone
+application rates. When at least one selected test
+reveals different outcomes, these constraints permit different decisions.
+Each absolute-value inequality in \eqref{eq:NA} is equivalent to
+two linear inequalities. The remaining variables $r,g,f$ provide mathematical connectivity
+certificates and need not be made nonanticipative: identical zone
+assignments in indistinguishable scenarios admit a common connectivity
+certificate. Likewise, the physical unit-level dose $d_j$ is identical
+whenever the associated $x$ and $u$ decisions coincide.
+
+Because the posterior coefficients in
+\eqref{eq:scenario-dispersion} and the conditional quantiles depend on
+$z$ through $\mathcal C_\omega(z)$, this is an exact mathematical
+representation of a \emph{finite-distribution} probing-enhanced problem,
+but is not directly a mixed-integer linear formulation. Deriving tractable
+reformulations, decomposition algorithms, or tailored branching rules is a
+separate methodological step. Furthermore, if the original signals are
+continuous, care is needed when constructing the finite scenario set:
+independently sampled continuous outcomes are almost surely distinct,
+and treating each distinct sample as a separate observation would
+artificially provide perfect identification of the sampled scenario.
+Signal discretization or a conditional-distribution approximation is
+therefore required for a meaningful scenario-based implementation.
+
+\section{Modeling scope and possible extensions}
+\label{sec:extensions}
+
+The proposed model isolates the value of information for nutrient management
+under a fixed crop and a fixed number of connected zones. Its homogeneity
+criterion applies to the \emph{initial} nutrient field. A uniform additive
+rate cannot alter within-zone spatial variation under the assumed nutrient
+balance, but an appropriate delineation avoids combining units requiring
+substantially different nutrient rates. The chance constraints guarantee a
+minimum nutritional condition; they do not explicitly maximize expected
+crop yield. If measured yield-response curves are available, one may
+replace the nutritional thresholds by a yield-based objective or yield
+reliability constraints. Other extensions include multiple nutrients,
+zone-specific application setup costs, physical constraints on fertilizer
+machinery, adaptive sequential testing, and explicit penalties for
+unattainable nutrition or homogeneity targets.

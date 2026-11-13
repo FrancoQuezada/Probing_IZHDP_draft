@@ -1,0 +1,56 @@
+\documentclass[11pt,a4paper]{article}
+
+% Compile with pdfLaTeX on Overleaf. The project is self-contained.
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,tabularx,array}
+\usepackage{microtype}
+\usepackage{needspace}
+\usepackage[round,authoryear]{natbib}
+\usepackage[hidelinks]{hyperref}
+
+\newcommand{\J}{\mathcal{J}}
+\newcommand{\I}{\mathcal{I}}
+\newcommand{\Eset}{\mathcal{E}}
+\newcommand{\A}{\mathcal{A}}
+\newcommand{\Z}{\mathcal{Z}}
+\newcommand{\Om}{\Omega}
+\newcommand{\EE}{\mathbb{E}}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\ind}{\mathbf{1}}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\numberwithin{equation}{section}
+\newtheorem{proposition}{Proposition}
+
+\title{A Probing-Enhanced Stochastic Programming Model for\\
+Intra-Zone Homogeneity Delineation and Nutrient Application}
+\author{Working draft -- author information to be added}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We formulate a probing-enhanced stochastic extension of the Intra-Zone Homogeneity
+Delineation Problem for site-specific nutrient application. A field is divided into
+a prescribed number of contiguous management zones, while the nutrient content of
+each spatial unit is uncertain. The decision-maker first selects soil-testing
+locations and subsequently uses the observed test outcomes to delineate the zones
+and prescribe a uniform nutrient application rate within each zone. The objective
+is to minimize the expected total cost of soil testing and nutrient application,
+subject to conditional intra-zone homogeneity and crop-nutrition requirements.
+We state a two-stage stochastic optimization formulation, give an explicit
+single-commodity-flow representation of connectivity, and describe the
+finite-scenario counterpart with probing-dependent nonanticipativity constraints.
+\end{abstract}
+
+\input{sections/model}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}
