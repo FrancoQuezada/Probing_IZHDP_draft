@@ -1,20 +1,31 @@
-# Probing-Enhanced IHDP -- Overleaf project
+# Probing-enhanced IHDP: four comparable models (Overleaf project)
 
-Upload `main.tex`, `references.bib`, and the `sections/` folder to a new Overleaf project, or upload the entire ZIP. Set `main.tex` as the main document and compile using pdfLaTeX.
+Import the ZIP into Overleaf. The main file is `main.tex` and the compiler is `pdfLaTeX` (references use BibTeX).
 
-- `main.tex`: document class, packages, title, abstract, and references.
-- `sections/model.tex`: paper-style introduction, problem definition, modeling notation, complete two-stage formulation, discussion of constraints, a dosing proposition, and a finite-scenario representation.
-- `references.bib`: reference to the supplied revised IHDP manuscript. This bibliographic item is intentionally described as a manuscript, not a published article.
+## Files
 
-Modeling assumptions to review before extending to computational experiments:
-1. One crop and one nutrient; fixed number K of nonempty contiguous zones.
-2. Nutrient status and potential test outcomes have a known joint probability distribution.
-3. Testing occurs before delineation and nutrient-rate decisions.
-4. Each management zone receives a uniform nutrient rate per hectare.
-5. Crop yield is represented by a nutritional sufficiency target rather than an explicit response curve.
-6. The homogeneity measure is an expected *within-zone* variance, not the global relative-variance (RV) index in the source IHDP manuscript. This is a purposeful modeling choice.
-7. The conditional chance constraints guarantee nutritional sufficiency *per geographic unit*, not jointly for the entire field.
-8. For the exact finite-scenario representation, potential test signals must be represented by appropriate finite/discretized outcomes. A naive independent sample-average approximation of continuous signals can artificially reveal the entire scenario.
-9. Feasibility of the recourse problem for (almost) every realized testing outcome is assumed; if that is not credible, one can add explicitly penalized homogeneity/nutritional slacks or otherwise restrict the first-stage feasible designs.
+- `main.tex`: preamble, article title and abstract.
+- `sections/model.tex`: research-style model with derivations and scenario counterparts.
+- `references.bib`: citation for the revised IHDP manuscript provided by the user.
 
-No solution method, linearization claim, data-calibrated agronomic relationship, or numerical results are implied by this draft.
+## Formulations included
+
+- **PE-0**: probing, fixed K connected zones, uniform zone-specific nutrient rates, and per-hectare conditional crop-nutrition chance constraints. No explicit homogeneity restriction.
+- **PE-1 (H1)**: PE-0 with posterior expected global Relative Variance (RV) at least alpha.
+- **PE-2 (H2)**: PE-0 with posterior probability of global RV >= alpha at least 1-beta.
+- **PE-3 (H3)**: PE-0 with posterior expected within-zone variance at most delta^2 for every zone.
+
+PE-1 and PE-2 use the same RV formula as the source deterministic IHDP, including its pooled sample-variance normalization. PE-3 is a different, zone-by-zone absolute dispersion criterion. They are **alternatives**, not simultaneous restrictions. Their stringency is not generally comparable at equal numerical thresholds.
+
+## Modeling conventions and limitations
+
+- One known crop and one nutrient; K is fixed and the adjacency graph is connected.
+- Testing precedes the adaptive delineation and uniform fertilization decisions.
+- The joint soil/test signal law is known; residual soil uncertainty remains after testing.
+- The overall objective is testing cost plus expected fertilizer cost. Crop yield is proxied by a nutritional sufficiency target rather than an explicit yield-response function.
+- Nutritional chance constraints apply individually to each geographic unit, conditional on each observed test result.
+- All three homogeneity specifications concern **initial** nutrient levels, before fertilizer addition.
+- For RV variants, the full-field realized variance is assumed positive almost surely.
+- Conditional requirements must hold for almost every observation under the selected probing design; strong thresholds may lead to infeasible recourse.
+- The finite-scenario representation is mathematically exact for a supplied finite joint distribution; the formulas are not a ready-to-run MILP because posterior coefficients and conditional homogeneity depend on probing decisions.
+- No numerical experiments are claimed.
